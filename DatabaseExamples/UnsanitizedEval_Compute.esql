@@ -1,0 +1,13 @@
+
+
+CREATE COMPUTE MODULE UnsanitizedEval_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.Properties = InputProperties;
+
+		--DECLARE userName CHAR 'firstUser'' OR T.name = CAST((PASSTHRU(''INSERT INTO ABC(A) VALUES(1)'') = PASSTHRU(''INSERT INTO ABC(A) VALUES(2)'')) AS CHARACTER CCSID 1208)--';
+		DECLARE userName CHAR 'firstUser'' OR T.name = CAST((PASSTHRU(''INSERT INTO ABC(A) VALUES(1)'') = PASSTHRU(''DROP TABLE FNERBLE'')) AS CHARACTER CCSID 1208)--';
+		SET OutputRoot.JSON.Data.result.id[] = EVAL('SELECT T.id FROM Database.USERDATA AS T WHERE T.name = ''' || userName || ''' ');
+		RETURN TRUE;
+	END;
+END MODULE;
