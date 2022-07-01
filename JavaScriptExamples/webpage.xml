@@ -1,0 +1,8 @@
+<html>
+<body>
+<h3>Title for page</h3>
+<p>
+<a href="/unsanitized404?userid=something%3Cscript%3Ealert(1)%3C/script%3Eelse">Test link</a>
+</p>
+</body>
+</html>
