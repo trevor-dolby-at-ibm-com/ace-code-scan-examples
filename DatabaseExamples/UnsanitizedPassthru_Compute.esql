@@ -1,0 +1,15 @@
+
+
+CREATE COMPUTE MODULE UnsanitizedPassthru_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.Properties = InputProperties;
+		
+		DECLARE userName CHAR '*'' OR T.name IN (SELECT name from USERDATA);--';
+		
+		--DECLARE userName CHAR 'firstUser';
+		SET OutputRoot.JSON.Data.result.id[] = PASSTHRU('SELECT T.id FROM USERDATA AS T WHERE T.name = ''' || userName || ''' ');
+		
+		RETURN TRUE;
+	END;
+END MODULE;
