@@ -1,0 +1,34 @@
+<html>
+<body>
+<h3>Demos of database calls</h3>
+<p>The examples on this page show how poorly-written ESQL that fails to sanitize input data can be made to perform actions other than the intended ones.</p> 
+<p>Randall Munroe's <a href="https://xkcd.com/327">XKCD comic from 2007</a> is one well-known illustration of this:</p>
+<img src="https://imgs.xkcd.com/comics/exploits_of_a_mom.png"/>
+<p>and the approach shown in this comic is used below in the first set of examples. The exact text is different due to using ESQL, but the concept is the same.</p>
+<p>
+Note that well-written ESQL does not suffer from most of these issues even if data is not sanitized, as the data is normally passed in via ODBC 
+parameters rather than simply appending the input data as text in an SQL string. The second set of examples show this in action.
+</p>
+<h3>1.1 ESQL PASSTHRU without parameter markers</h3><p>
+This form queries user ID numbers for a single user name provided in the form. Valid values include <pre>firstUser</pre> and <pre>secondUser</pre> but the code does not sanitize the data.
+As a result, using a value of <pre>*' OR T.name IN (SELECT name from USERDATA);--</pre> will cause the code to return all the values in the database.<br/>
+<br/>
+<form action="/unsanitizedPassthru" method="GET">
+  <div><label for="userName">User name to look up</label><input name="userName" id="userName" value="firstUser"/></div><br/>
+  <div><button>Query records from database</button></div>
+</form></p>
+<h3>1.2 ESQL EVAL with input data appended as text</h3><p>
+This form also queries user ID numbers for a single user name provided in the form. Valid values include <pre>firstUser</pre> and <pre>secondUser</pre> but the code does not sanitize the data.
+As a result, using a value of 
+<pre>firstUser' OR T.name = CAST((PASSTHRU('INSERT INTO ABC(A) VALUES(1)') = PASSTHRU('DROP TABLE STUDENTS')) AS CHARACTER CCSID 1208)--</pre> 
+will cause the code to attempt to insert the specified data into the table ABC and will also attempt to drop the STUDENTS table.<br/>
+<br/>
+<form action="/unsanitizedEval" method="GET">
+  <div><label for="userName">User name to look up</label><input name="userName" id="userName" value="firstUser"/></div><br/>
+  <div><button>Query records from database</button></div>
+</form></p>
+<hr/>
+<hr/>
+<p><a href="/unsanitized404?userName=something%3Cscript%3Ealert(1)%3C/script%3Eelse">Link for JavaScript alert using flow-created 404</a></p>
+</body>
+</html>

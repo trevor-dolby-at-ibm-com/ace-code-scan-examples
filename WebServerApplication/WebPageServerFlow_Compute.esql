@@ -1,0 +1,16 @@
+
+
+CREATE COMPUTE MODULE WebPageServerFlow_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.Properties = InputProperties;
+		SET OutputRoot.HTTPReplyHeader."Content-Type" = 'text/html';
+		
+	    DECLARE WORKDIR CHARACTER;
+		SET WORKDIR = SUBSTRING(WorkPath BEFORE 'config');
+		SET OutputLocalEnvironment.Destination.File.Directory = WORKDIR || 'run/WebServerApplication';
+		SET OutputLocalEnvironment.Destination.File.Name = 'webpage.xml';
+		
+		RETURN TRUE;
+	END;
+END MODULE;
