@@ -29,7 +29,31 @@ will cause the code to attempt to insert the specified data into the table ABC a
   <div><label for="userName">User name to look up: </label><input name="userName" id="userName" value="secondUser"/></div><br/>
   <div><button>Query records from database</button></div>
 </form></p>
+
 <hr/>
+
+<h3>2.1 ESQL PASSTHRU with the usual parameter markers</h3><p>
+This form queries user ID numbers for a single user name provided in the form using <code>PASSTHRU('SELECT T.id FROM USERDATA AS T WHERE T.name = ?')</code>.<br/>
+Valid values include <code>firstUser</code> and <code>secondUser</code> and the code does passes the value through using standard ODBC 
+parameter bindings, so using a value of 
+<pre>*' OR T.name IN (SELECT name from USERDATA);--</pre> will return an empty result.<br/>
+<br/>
+<form action="/normalPassthru" method="GET">
+  <div><label for="userName">User name to look up: </label><input name="userName" id="userName" value="firstUser"/></div><br/>
+  <div><button>Query records from database</button></div>
+</form></p>
+<h3>2.2 ESQL EVAL with input data as a variable</h3><p>
+This form also queries user ID numbers for a single user name provided in the form using <code>EVAL('SELECT T.id FROM Database.USERDATA AS T WHERE T.name = userName')</code>.<br/>
+Valid values include <code>firstUser</code> and <code>secondUser</code> and the code does passes the value through using standard ODBC 
+parameter bindings, so using a value of  
+<pre>firstUser' OR T.name = CAST((PASSTHRU('INSERT INTO ABC(A) VALUES(1)') = PASSTHRU('DROP TABLE STUDENTS')) AS CHARACTER CCSID 1208)--</pre> 
+will cause a data length error (due to the length of the string) but will not execute SQL commands.<br/>
+<br/>
+<form action="/normalEval" method="GET">
+  <div><label for="userName">User name to look up: </label><input name="userName" id="userName" value="secondUser"/></div><br/>
+  <div><button>Query records from database</button></div>
+</form></p>
+
 <hr/>
 <p><a href="/unsanitized404?userName=something%3Cscript%3Ealert(1)%3C/script%3Eelse">Link for JavaScript alert using flow-created 404</a></p>
 </body>

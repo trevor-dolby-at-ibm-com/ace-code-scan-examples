@@ -1,0 +1,11 @@
+
+
+CREATE COMPUTE MODULE NormalPassthru_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.Properties = InputProperties;
+		DECLARE userName CHAR InputLocalEnvironment.HTTP.Input.QueryString.userName;
+		SET OutputRoot.JSON.Data.result.id[] = PASSTHRU('SELECT T.id FROM USERDATA AS T WHERE T.name = ?' VALUES (userName));
+		RETURN TRUE;
+	END;
+END MODULE;

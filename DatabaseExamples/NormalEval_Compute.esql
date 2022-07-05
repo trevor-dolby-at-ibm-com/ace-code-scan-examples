@@ -1,0 +1,11 @@
+
+
+CREATE COMPUTE MODULE NormalEval_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.Properties = InputProperties;
+		DECLARE userName CHAR InputLocalEnvironment.HTTP.Input.QueryString.userName;
+		SET OutputRoot.JSON.Data.result.id[] = EVAL('SELECT T.id FROM Database.USERDATA AS T WHERE T.name =  userName');
+		RETURN TRUE;
+	END;
+END MODULE;
