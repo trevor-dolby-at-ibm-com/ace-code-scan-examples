@@ -4,8 +4,18 @@ CREATE COMPUTE MODULE UnsanitizedEval_Compute
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		SET OutputRoot.Properties = InputProperties;
+		
 		DECLARE userName CHAR InputLocalEnvironment.HTTP.Input.QueryString.userName;
-		SET OutputRoot.JSON.Data.result.id[] = EVAL('SELECT T.id FROM Database.USERDATA AS T WHERE T.name = ''' || userName || ''' ');
+		
+		-- Injection attacks possible with this
+		SET OutputRoot.JSON.Data.result.id[] = 
+		  EVAL('SELECT T.id FROM Database.USERDATA AS T WHERE T.name = ''' || userName || ''' ');
+
+		-- Use this instead!
+		--
+		-- SET OutputRoot.JSON.Data.result.id[] = 
+		--   SELECT T.id FROM Database.USERDATA AS T WHERE T.name = userName;
+		
 		RETURN TRUE;
 	END;
 END MODULE;
