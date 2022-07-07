@@ -9,6 +9,23 @@
 Note that well-written ESQL does not suffer from most of these issues even if data is not sanitized, as the data is normally passed in via ODBC 
 parameters rather than simply appending the input data as text in an SQL string. The second set of examples show this in action.
 </p>
+<p>
+<h3>SQL for one-time table setup</h3>
+This demo was built with DB2 on Cloud, and the following SQL was used to create the tables and insert the test data:
+<pre>
+select * from userdata;
+select * from abc;
+
+drop table userdata;
+drop table abc;
+
+create table userdata(ID VARCHAR(128), NAME VARCHAR(128));
+create table abc(A INTEGER);
+
+insert into userdata(id, name) VALUES('1', 'firstUser');
+insert into userdata(id, name) VALUES('2', 'secondUser');
+</pre>
+</p>
 
 <script>
   function callURLAndPopulateDiv(theForm, theURL, theDivID) {
