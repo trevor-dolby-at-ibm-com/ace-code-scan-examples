@@ -1,0 +1,13 @@
+
+
+CREATE COMPUTE MODULE ForwardHTTPURL_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.Properties = InputProperties;
+		
+		SET OutputLocalEnvironment.Destination.HTTP.RequestURL = 
+		  InputLocalEnvironment.HTTP.Input.QueryString.testURL;
+		  
+		RETURN TRUE;
+	END;
+END MODULE;

@@ -9,7 +9,7 @@
 Note that well-written ESQL does not suffer from most of these issues even if data is not sanitized, as the data is normally passed in via ODBC 
 parameters rather than simply appending the input data as text in an SQL string. The second set of examples show this in action.
 </p>
-<h3>1.1 ESQL PASSTHRU without parameter markers</h3><p>
+<h2>1.1 ESQL PASSTHRU without parameter markers</h2><p>
 This form queries user ID numbers for a single user name provided in the form using <code>PASSTHRU('SELECT T.id FROM USERDATA AS T WHERE T.name = ''' || userName || ''' ')</code>.<br/>
 Valid values include <code>firstUser</code> and <code>secondUser</code> but the code does not sanitize the data, and using a value of 
 <pre>*' OR T.name IN (SELECT name from USERDATA);--</pre> will cause the code to return all the values in the database.<br/>
@@ -18,8 +18,9 @@ Valid values include <code>firstUser</code> and <code>secondUser</code> but the 
   <div><label for="userName">User name to look up: </label><input name="userName" id="userName" value="firstUser"/></div><br/>
   <div><button>Query records from database</button></div>
 </form></p>
+Note that the above code has other issues, including runtime CPU cost and database statement caching issues.<br/>
 
-<h3>1.2 ESQL EVAL with input data appended as text</h3><p>
+<h2>1.2 ESQL EVAL with input data appended as text</h2><p>
 This form also queries user ID numbers for a single user name provided in the form using <code>EVAL('SELECT T.id FROM Database.USERDATA AS T WHERE T.name = ''' || userName || ''' ')</code>.<br/>
 Valid values include <code>firstUser</code> and <code>secondUser</code> but the code does not sanitize the data, and using a value of 
 <pre>firstUser' OR T.name = CAST((PASSTHRU('INSERT INTO ABC(A) VALUES(1)') = PASSTHRU('DROP TABLE STUDENTS')) AS CHARACTER CCSID 1208)--</pre> 
@@ -29,10 +30,11 @@ will cause the code to attempt to insert the specified data into the table ABC a
   <div><label for="userName">User name to look up: </label><input name="userName" id="userName" value="secondUser"/></div><br/>
   <div><button>Query records from database</button></div>
 </form></p>
-
+<br/>
+Note that the above code has other issues, including runtime CPU cost and database statement caching issues.
 <hr/>
 
-<h3>2.1 ESQL PASSTHRU with the usual parameter markers</h3><p>
+<h2>2.1 ESQL PASSTHRU with the usual parameter markers</h2><p>
 This form queries user ID numbers for a single user name provided in the form using <code>PASSTHRU('SELECT T.id FROM USERDATA AS T WHERE T.name = ?')</code>.<br/>
 Valid values include <code>firstUser</code> and <code>secondUser</code> and the code does passes the value through using standard ODBC 
 parameter bindings, so using a value of 
@@ -42,7 +44,7 @@ parameter bindings, so using a value of
   <div><label for="userName">User name to look up: </label><input name="userName" id="userName" value="firstUser"/></div><br/>
   <div><button>Query records from database</button></div>
 </form></p>
-<h3>2.2 ESQL EVAL with input data as a variable</h3><p>
+<h2>2.2 ESQL EVAL with input data as a variable</h2><p>
 This form also queries user ID numbers for a single user name provided in the form using <code>EVAL('SELECT T.id FROM Database.USERDATA AS T WHERE T.name = userName')</code>.<br/>
 Valid values include <code>firstUser</code> and <code>secondUser</code> and the code does passes the value through using standard ODBC 
 parameter bindings, so using a value of  
@@ -53,8 +55,36 @@ will cause a data length error (due to the length of the string) but will not ex
   <div><label for="userName">User name to look up: </label><input name="userName" id="userName" value="secondUser"/></div><br/>
   <div><button>Query records from database</button></div>
 </form></p>
+Note that the above code has other issues, including runtime CPU cost.<br/>
 
 <hr/>
-<p><a href="/unsanitized404?userName=something%3Cscript%3Ealert(1)%3C/script%3Eelse">Link for JavaScript alert using flow-created 404</a></p>
+
+<h2>3.1 ESQL creating an HTML 404 message using input data</h2><p>
+This form proxies a URL using <pre>        DECLARE response CHARACTER;
+        SET response = '&lt;html&gt;&lt;body&gt;&lt;h3&gt;Not Found&lt;/h3&gt;&lt;p&gt;The userid ' || 
+          InputLocalEnvironment.HTTP.Input.QueryString.userName || 
+          ' could not be found&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;';
+        SET OutputRoot.BLOB.BLOB = CAST(response AS BLOB CCSID 1208);</pre>
+which can be made to return script tags that execute JavaScript in the calling browser; these scripts
+will themselves be able to call the server again without CORS issues.
+<br/>
+<br/>
+<form action="/unsanitized404" method="GET">
+  <div><label for="userName">User name to look up: </label><input name="userName" id="userName" value="something<script>alert(1)</script>else"/></div><br/>
+  <div><button>Query records from database</button></div>
+</form></p>
+Note that the above code could be written to use the XMLNSC parser and avoid the problem.<br/>
+
+<hr/>
+
+<h2>4.1 ESQL setting LocalEnvironment overrides for HTTP URL</h2><p>
+This form proxies a URL using <code>SET OutputLocalEnvironment.Destination.HTTP.RequestURL = InputLocalEnvironment.HTTP.Input.QueryString.testURL;</code>.<br/>
+While this scenario is not likely in production systems, it might be used in testing (checking SSL connectivity, for example), 
+and will access the network from the server itself.<br/>
+<br/>
+<form action="/forwardHTTPURL" method="GET">
+  <div><label for="testURL">URL to call: </label><input name="testURL" id="testURL" value="https://www.ibm.com/legal?lnk=flg-tous-usen"/></div><br/>
+  <div><button>Call URL</button></div>
+</form></p>
 </body>
 </html>

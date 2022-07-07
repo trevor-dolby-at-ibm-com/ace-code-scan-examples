@@ -9,9 +9,9 @@ CREATE COMPUTE MODULE Unsanitized404_Compute
 		SET OutputRoot.HTTPReplyHeader."Content-Type" = 'text/html';
 		
 		DECLARE response CHARACTER;
-		SET response = '<html><body><h3>Not Found</h3><p>The userid' || 
+		SET response = '<html><body><h3>Not Found</h3><p>The userid ' || 
 		  InputLocalEnvironment.HTTP.Input.QueryString.userName || 
-		  'could not be found</p></body></html>';
+		  ' could not be found</p></body></html>';
 		SET OutputRoot.BLOB.BLOB = CAST(response AS BLOB CCSID 1208);
 		
 		-- These are more secure because the XMLNSC parser will escape the HTML tag angle brackets.
