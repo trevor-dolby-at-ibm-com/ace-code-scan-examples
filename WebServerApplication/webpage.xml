@@ -106,7 +106,7 @@ will themselves be able to call the server again without CORS issues.
 <br/>
 <br/>
 <form action="/unsanitized404" method="GET">
-  <div><label for="userName">User name to look up: </label><input name="userName" id="userName" value="something<script>alert(1)</script>else"/></div><br/>
+  <div><label for="userName">User name to look up: </label><input name="userName" id="userName" value="something&lt;script&gt;alert(1)&lt;/script&gt;else"/></div><br/>
   <div><button>Query records from database</button></div>
 </form></p>
 Note that the above code could be written to use the XMLNSC parser and avoid the problem.<br/>
